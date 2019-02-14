@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Advance Local - Code Excerise" />
+    <meta name="author" content="Dallas Gale" />
+    <title>Advance Local - Code Excercise</title>
+    <link href="https://fonts.googleapis.com/css?family=Yeseva+One" rel="stylesheet">
+
+    <style>
+      body {
+        background: #fff;
+        color: #000;
+        font-size: 14px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      a {
+        color: black;
+        font-weight: bold;
+      }
+
+      .header {
+        background: white;
+        border-bottom: 5px double black;
+        color: black;
+        position: fixed;
+        top: 0;
+        text-align: center;
+        width: 100%;
+        z-index: 10;
+      }
+
+      .h1 {
+        font-weight: 100;
+        font-family:Georgia, 'Times New Roman', Times, serif;
+      }
+
+      .title {
+        line-height: 1em;
+        font-size: 3em;
+        font-weight: 100;
+        color: #242424;
+        font-family:Georgia, 'Times New Roman', Times, serif;
+      }
+
+      p {
+        font-family: Georgia, 'Times New Roman', Times, serif;
+        font-size: 1em;
+        line-height: 1.5em;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
+        grid-column-gap: 10%;
+        width: 80%;
+        margin: 0 auto;
+        margin-top: 120px;
+      }
+
+      .article {
+        display: block;
+        width: 100%;
+      }
+
+      .caption {
+        display: block;
+        vertical-align: top;
+      }
+
+      .hero {
+        display: block;
+        margin-bottom: 1em;
+      }
+      .hero__image {
+        display: block;
+        width: 100%;
+      }
+      
+    </style>
+  </head>
+
+  <body>
+    <!-- Start HTML -->
+    <header class="header">
+      <h1 class="h1">Calling data from...</h1>
+    </header>
+    <section class="content" id="advance-local-news">
+      
+    </section>
+
+    <!-- Start JS -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+
+      async function callApi() {
+        try {
+
+          const advaneLocal = await axios('http://mtrest.advance.net/mtrest/articles/?blog_id=3674&limit=10&offset=0');
+          const results = advaneLocal.data.result;
+          
+
+          // Map over results 
+          results.map(res => {
+            console.log(res.multimedia_main)
+            let html = ``;
+            let title = res.title;
+            let caption = res.multimedia_main.caption;
+            let body = res.raw_body;
+            let img = res.multimedia_main.url;
+            
+            if (caption !== undefined) {
+              html = `
+                <div class="article">
+                  <h2 class="title">${title}</h2>
+                  <div class="hero">
+                    <img class="hero__image" src=${img} />
+                  </div>
+
+                  <small class="caption">${caption}</small>
+                  <hr />
+                  <p class="body-text">${body}</p>
+                </div>
+              `;
+              document.getElementById("advance-local-news").innerHTML += html;
+            } else {
+              return;
+            }
+            console.log(res.multimedia_main.caption);
+
+          })
+          
+
+          // advHtml.innerHTML(results);
+        
+        } catch(e) {
+          console.error(e);
+        }
+      };
+
+      callApi();
+
+    
+
+    </script>
+
+  </body>
+</html>
