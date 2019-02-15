@@ -9,17 +9,37 @@
     <title>Advance Local - Code Excercise</title>
     <link href="https://fonts.googleapis.com/css?family=Yeseva+One" rel="stylesheet">
 
+    <!-- CSS -->
     <style>
       body {
         background: #fff;
         color: #000;
         font-size: 14px;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family:Georgia, 'Times New Roman', Times, serif;
       }
 
       a {
         color: black;
         font-weight: bold;
+      }
+
+      .article {
+        display: block;
+        width: 100%;
+      }
+
+      .caption {
+        display: block;
+        vertical-align: top;
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
+        grid-column-gap: 10%;
+        width: 80%;
+        margin: 0 auto;
+        margin-top: 120px;
       }
 
       .header {
@@ -38,115 +58,146 @@
         font-family:Georgia, 'Times New Roman', Times, serif;
       }
 
-      .title {
-        line-height: 1em;
-        font-size: 3em;
-        font-weight: 100;
-        color: #242424;
-        font-family:Georgia, 'Times New Roman', Times, serif;
+      .hero {
+        display: block;
+        margin-bottom: 1em;
+      }
+      
+      .hero__image {
+        display: block;
+        width: 100%;
       }
 
+      .hidden {
+        display: none;
+        visibility: hidden;
+      }
+      
       p {
         font-family: Georgia, 'Times New Roman', Times, serif;
         font-size: 1em;
         line-height: 1.5em;
       }
 
-      .content {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
-        grid-column-gap: 10%;
-        width: 80%;
-        margin: 0 auto;
-        margin-top: 120px;
+      .title {
+        line-height: 1em;
+        font-size: 3em;
+        font-weight: 100;
+        color: #242424;
+        font-family: Georgia, 'Times New Roman', Times, serif;
       }
 
-      .article {
-        display: block;
-        width: 100%;
-      }
-
-      .caption {
-        display: block;
-        vertical-align: top;
-      }
-
-      .hero {
-        display: block;
-        margin-bottom: 1em;
-      }
-      .hero__image {
-        display: block;
-        width: 100%;
-      }
       
     </style>
+
   </head>
 
   <body>
-    <!-- Start HTML -->
     <header class="header">
-      <h1 class="h1">Calling data from...</h1>
+      <h1 class="h1">
+        Calling data from 'mtrest.advance.net/' - See data from <button onClick="handleApiSwap2()">'swapi.co'</button>
+      </h1>
     </header>
-    <section class="content" id="advance-local-news">
-      
+    <section 
+      class="content visible" 
+      id="advance-local-news">
+      <!-- JS rendered HTML get's injected here. See: ln 144 -->
+    </section>
+    <section 
+      class="content hidden" 
+      id="swapi">
+      SWAPI
+      <!-- JS rendered HTML get's injected here. See: ln 144 -->
     </section>
 
-    <!-- Start JS -->
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
+    <!--  Start JS -->
     <script>
 
-      async function callApi() {
-        try {
+      // VARIABLES
+      const ADVANCE_API_URL = 'http://mtrest.advance.net/mtrest/articles/?blog_id=3674&limit=10&offset=0'; 
+      const ADVANCE_HTML_CONTENT = document.getElementById("advance-local-news");
+      const SWAPI_HTML_CONTENT = document.getElementById("swapi");
 
-          const advaneLocal = await axios('http://mtrest.advance.net/mtrest/articles/?blog_id=3674&limit=10&offset=0');
-          const results = advaneLocal.data.result;
-          
+      // Using native Fetch() api - not supported in IE but there are polyfills around.
+      fetch(ADVANCE_API_URL)
 
-          // Map over results 
-          results.map(res => {
-            console.log(res.multimedia_main)
-            let html = ``;
-            let title = res.title;
-            let caption = res.multimedia_main.caption;
-            let body = res.raw_body;
-            let img = res.multimedia_main.url;
+        // Check if there was a 200 reterned from the server
+        .then(response => {
+          if (response.status !== 200) {
+            console.log('Looks like there was a problem. Status Code: ' +
+              response.status);
+            return;
+          }
+
+          response.json()
+            .then(responseData => {
             
-            if (caption !== undefined) {
-              html = `
-                <div class="article">
-                  <h2 class="title">${title}</h2>
-                  <div class="hero">
-                    <img class="hero__image" src=${img} />
-                  </div>
+            // The variable where the markup will be stored to then be assigned to a dom ID for rendering.
+            let HTML = ``; 
 
-                  <small class="caption">${caption}</small>
-                  <hr />
-                  <p class="body-text">${body}</p>
-                </div>
-              `;
-              document.getElementById("advance-local-news").innerHTML += html;
-            } else {
-              return;
-            }
-            console.log(res.multimedia_main.caption);
+            // Assign the parent data layer to the a re-usable variable.
+            let data = responseData.result; 
+            
+                data.map(d => {
+                  // console.log(d);
+                  // Add a conditional to filter out missing pieces of content such as null / empty / undefined 
 
-          })
-          
+                  // Break out data pieces needed to be rendered ( and mapped over! ) into variables
+                  let title = d.title;
+                  let caption = d.multimedia_main.caption;
+                  let body = d.raw_body;
+                  let img = d.multimedia_main.url;
 
-          // advHtml.innerHTML(results);
-        
-        } catch(e) {
-          console.error(e);
+                  // Build up the article html here
+                  return (
+                    HTML += `
+                      <div class="article">
+                        <h2 class="title">${title}</h2>
+                        <div class="hero">
+                          <img class="hero__image" src=${img} />
+                        </div>
+
+                        <small class="caption">${caption}</small>
+                        <hr />
+                        <p class="body-text">${body}</p>
+                      </div>`
+                  )
+                }
+              );
+
+              // Finally render the mapped data to the DOM.
+              ADVANCE_HTML_CONTENT.innerHTML += HTML;
+
+              // THE END
+          }
+        )
+        .catch((error) => console.log('Fetch error', error))
         }
-      };
-
-      callApi();
-
-    
-
+      );
     </script>
 
+
+
+    <script>
+      
+      function handleApiSwap2() {
+        // alert('swapi alert');
+        if (ADVANCE_HTML_CONTENT.classList.contains('visible'))
+        {
+          ADVANCE_HTML_CONTENT.classList.add('hidden');
+          ADVANCE_HTML_CONTENT.classList.remove('visible');
+          SWAPI_HTML_CONTENT.classList.add('visible');
+          SWAPI_HTML_CONTENT.classList.remove('hidden');
+          return;
+        } 
+        else if (ADVANCE_HTML_CONTENT.classList.contains('hidden'))
+          ADVANCE_HTML_CONTENT.classList.add('visible');
+          ADVANCE_HTML_CONTENT.classList.remove('hidden');
+          SWAPI_HTML_CONTENT.classList.remove('visible');
+          SWAPI_HTML_CONTENT.classList.add('hidden');
+          return;
+        }
+
+    </script>
   </body>
 </html>
