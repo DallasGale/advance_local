@@ -16,6 +16,7 @@
         color: #000;
         font-size: 14px;
         font-family:Georgia, 'Times New Roman', Times, serif;
+        margin: 0;
       }
 
       a {
@@ -33,19 +34,26 @@
         vertical-align: top;
       }
 
-      .content {
+      .advance-content {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
         grid-column-gap: 10%;
         width: 80%;
         margin: 0 auto;
-        margin-top: 120px;
+        margin-top: 75px;
+      }
+
+      .swapi-content {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
+        grid-column-gap: 10%;
+        width: 80%;
+        margin: 0 auto;
       }
 
       .header {
-        background: white;
-        border-bottom: 5px double black;
-        color: black;
+        background: rgb(41, 41, 41);
+        color: rgb(233, 233, 233);
         position: fixed;
         top: 0;
         text-align: center;
@@ -78,10 +86,41 @@
         font-size: 1em;
         line-height: 1.5em;
       }
+      .swapi {
+        background: #212121;
+        color: white;
+        min-height: 100vh;
+        width: 100%;
+      }
 
-      .title {
-        line-height: 1em;
+      .swapi__grid {
+        width: 80%;
+        height: 100vh;
+        margin: 0 auto;
+        margin-top: 75px;
+        padding-top: 100px;
+      }
+
+      .swapi__person {
+        color: gold;
         font-size: 3em;
+        text-shadow: 2px 2px #000000;
+      }
+
+      .swapi__h2 {
+        color: rgb(187, 185, 174);
+        font-weight: 100;
+        font-size: 1.4em;
+        text-transform: capitalize;
+      }
+
+      .swapi__detail {
+        color: white;
+      }
+
+      .adv__title {
+        line-height: 1.3em;
+        font-size: 2em;
         font-weight: 100;
         color: #242424;
         font-family: Georgia, 'Times New Roman', Times, serif;
@@ -99,14 +138,14 @@
       </h1>
     </header>
     <section 
-      class="content visible" 
+      class="advance-content  advance-local  visible" 
       id="advance-local-news">
       <!-- JS rendered HTML get's injected here. See: ln 144 -->
     </section>
     <section 
-      class="content hidden" 
+      class="swapi" 
       id="swapi">
-      SWAPI
+      <div class="swapi-content  swapi__grid  hidden" id="swapi__html"></div>
       <!-- JS rendered HTML get's injected here. See: ln 144 -->
     </section>
 
@@ -115,16 +154,17 @@
 
       // VARIABLES
       const ADVANCE_API_URL = 'http://mtrest.advance.net/mtrest/articles/?blog_id=3674&limit=10&offset=0'; 
-      const SWAPI_API_URL = 'https://swapi.co/api/people/1'; 
+      const SWAPI_API_URL = 'https://swapi.co/api/people/'; 
       
       const ADVANCE_HTML_CONTENT = document.getElementById("advance-local-news");
-      const SWAPI_HTML_CONTENT = document.getElementById("swapi");
+      const SWAPI_HTML_CONTENT = document.getElementById("swapi__html");
 
       const urls = [
         ADVANCE_API_URL,
         SWAPI_API_URL
       ]
 
+      // ADVANCE_API_URL DATA
       fetch(urls[0])
 
       // Using native Fetch() api - not supported in IE but there are polyfills around.
@@ -138,6 +178,7 @@
 
           response.json()
             .then(responseData => {
+
             
             // The variable where the markup will be stored to then be assigned to a dom ID for rendering.
             let HTML = ``; 
@@ -159,7 +200,7 @@
                   return (
                     HTML += `
                       <div class="article">
-                        <h2 class="title">${title}</h2>
+                        <h2 class="adv__title">${title}</h2>
                         <div class="hero">
                           <img class="hero__image" src=${img} />
                         </div>
@@ -175,6 +216,66 @@
               // Finally render the mapped data to the DOM.
               ADVANCE_HTML_CONTENT.innerHTML += HTML;
 
+              // THE END
+          }
+        )
+        .catch((error) => console.log('Fetch error', error))
+        }
+      );
+
+
+
+
+      // SWAPI DATA
+      // ADVANCE_API_URL DATA
+      fetch(urls[1])
+
+      // Using native Fetch() api - not supported in IE but there are polyfills around.
+      // Check if there was a 200 reterned from the server
+        .then(response => {
+          if (response.status !== 200) {
+            console.log('Looks like there was a problem. Status Code: ' +
+              response.status);
+            return;
+          }
+
+          response.json()
+            .then(responseData => {
+            
+            // The variable where the markup will be stored to then be assigned to a dom ID for rendering.
+            let SWAPI_HTML = ``; 
+
+            // Assign the parent data layer to the a re-usable variable.
+            let data = responseData.results; 
+                console.log(data);
+                data.map(d => {
+                  // console.log(d);
+                  // Add a conditional to filter out missing pieces of content such as null / empty / undefined 
+
+                  // Break out data pieces needed to be rendered ( and mapped over! ) into variables
+                  let name = d.name;
+                  let eyeColor = d.eye_color;
+                  let gender = d.gender;
+                  let skin_color = d.skin_color;
+                  let films = d.films;
+                  // Build up the article html here
+                  return (
+                    SWAPI_HTML += `
+                      <div class="article">
+                        <h2 class="swapi__h2"><span class="swapi__person">${name}</span></h2>
+                        <h2 class="swapi__h2">GENDER: <span class="swapi__detail">${gender}</span></h2>
+                        <h2 class="swapi__h2"># FILMS: <span class="swapi__detail">${films.length}</span></h2>
+                        <h2 class="swapi__h2">SKIN COLOR: <span class="swapi__detail">${skin_color}</span></h2>
+                      </div>
+                     `
+                  )
+                }
+              );
+
+              // Finally render the mapped data to the DOM.
+              SWAPI_HTML_CONTENT.innerHTML += SWAPI_HTML;
+
+              console.log(SWAPI_HTML);
               // THE END
           }
         )
