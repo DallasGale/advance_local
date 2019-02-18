@@ -115,13 +115,20 @@
 
       // VARIABLES
       const ADVANCE_API_URL = 'http://mtrest.advance.net/mtrest/articles/?blog_id=3674&limit=10&offset=0'; 
+      const SWAPI_API_URL = 'https://swapi.co/api/people/1'; 
+      
       const ADVANCE_HTML_CONTENT = document.getElementById("advance-local-news");
       const SWAPI_HTML_CONTENT = document.getElementById("swapi");
 
-      // Using native Fetch() api - not supported in IE but there are polyfills around.
-      fetch(ADVANCE_API_URL)
+      const urls = [
+        ADVANCE_API_URL,
+        SWAPI_API_URL
+      ]
 
-        // Check if there was a 200 reterned from the server
+      fetch(urls[0])
+
+      // Using native Fetch() api - not supported in IE but there are polyfills around.
+      // Check if there was a 200 reterned from the server
         .then(response => {
           if (response.status !== 200) {
             console.log('Looks like there was a problem. Status Code: ' +
