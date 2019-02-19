@@ -12,8 +12,8 @@
     <!-- CSS -->
     <style>
       .adv__title {
-        line-height: 1.3em;
-        font-size: 2em;
+        line-height: 1.2em;
+        font-size: 1.5em;
         font-weight: 100;
         color: #242424;
         /* font-family: Georgia, 'Times New Roman', Times, serif; */
@@ -39,6 +39,8 @@
 
       .caption {
         display: block;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 0.8em;
         vertical-align: top;
       }
 
@@ -49,7 +51,7 @@
         grid-column-gap: 10%;
         width: 80%;
         margin: 0 auto;
-        margin-top: 75px;
+        margin-top: 195px;
         padding: 50px;
       }
 
@@ -72,9 +74,10 @@
       }
 
       .h1 {
+        color: white;
         font-weight: 100;
-        font-size: 0.8em;
-        font-family:Georgia, 'Times New Roman', Times, serif;
+        font-size: 1.5em;
+        padding: 20px;
       }
 
       .hero {
@@ -128,7 +131,8 @@
       }
       
       p {
-        /* font-family: Georgia, 'Times New Roman', Times, serif; */
+
+        font-family: Arial, Helvetica, sans-serif;
         font-size: 1em;
         line-height: 1.5em;
       }
@@ -171,13 +175,10 @@
         color: #1b091a;
         display: block;
         font-weight: bold;
-        left: 0;
         margin: 0 auto;
+        margin-bottom: 20px;
         padding: 10px;
-        position: absolute;
-        width: 210px;
-        right: 0;
-        top: 20px;
+        width: 410px;
         transition: all 0.2s; 
       }
       .toggle:hover {
@@ -203,8 +204,10 @@
   <body>
     <header class="header">
       <h1 class="h1">
-        <button class="toggle" onClick="handleApiSwap2()">CLICK HERE TO TOGGLE API'S</button>
+        TASK 1. Example of HMTL, Vanilla JS & CSS fetching 2 api's and displaying the data.
       </h1>
+      <button class="toggle" onClick="handleApiSwap2()">CLICK HERE TO TOGGLE BETWEEN API DATA</button>
+
     </header>
     
     <section 
@@ -260,7 +263,7 @@
 
           response.json()
             .then(responseData => {
-
+              
             
             // The variable where the markup will be stored to then be assigned to a dom ID for rendering.
             let HTML = ``; 
@@ -269,27 +272,39 @@
             let data = responseData.result; 
             
                 data.map(d => {
-                  // console.log(d);
+                  console.log(d);
                   // Add a conditional to filter out missing pieces of content such as null / empty / undefined 
 
                   // Break out data pieces needed to be rendered ( and mapped over! ) into variables
+                  let author = d.author.display_name;
+                  let author_url = d.author.profile_url;
                   let title = d.title;
+                  // let date = d.date.created_on;
+                  // let parsedDate = new Date(date);
                   let caption = d.multimedia_main.caption;
                   let body = d.raw_body;
                   let img = d.multimedia_main.url;
+                  // console.log(parsedDate);
 
                   // Build up the article html here
                   return (
                     HTML += `
                       <div class="article">
-                        <h2 class="adv__title">${title}</h2>
-                        <div class="hero">
-                          <img class="hero__image" src=${img} />
-                        </div>
+                          <small>Written by <a href=${author_url}>${author}</a></small>
+                          
+                        ${ title ? `<h2 class="adv__title">${title}</h2>` : "" }
+                        
+                        ${ img ? (`
+                          <div class="hero">
+                            <img class="hero__image" src=${img} />
+                          </div>
+                          `) : "" }
 
-                        <small class="caption">${caption}</small>
+                        ${ caption ? `<small class="caption">${caption}</small>` : "" }
+
                         <hr />
-                        <p class="body-text">${body}</p>
+
+                        ${ body ? `<p class="body-text">${body}</p>` : "" }
                       </div>`
                   )
                 }
