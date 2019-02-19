@@ -11,11 +11,19 @@
 
     <!-- CSS -->
     <style>
+      .adv__title {
+        line-height: 1.3em;
+        font-size: 2em;
+        font-weight: 100;
+        color: #242424;
+        /* font-family: Georgia, 'Times New Roman', Times, serif; */
+      }
+
       body {
-        background: #fff;
+        background: #470046;
         color: #000;
         font-size: 14px;
-        font-family:Georgia, 'Times New Roman', Times, serif;
+        font-family: 'Yeseva One', cursive;
         margin: 0;
       }
 
@@ -35,12 +43,14 @@
       }
 
       .advance-content {
+        background: white;
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(40%, 2fr));
         grid-column-gap: 10%;
         width: 80%;
         margin: 0 auto;
         margin-top: 75px;
+        padding: 50px;
       }
 
       .swapi-content {
@@ -52,8 +62,8 @@
       }
 
       .header {
-        background: rgb(41, 41, 41);
-        color: rgb(233, 233, 233);
+        background: #380037;
+        color:  rgb(41, 41, 41);
         position: fixed;
         top: 0;
         text-align: center;
@@ -63,6 +73,7 @@
 
       .h1 {
         font-weight: 100;
+        font-size: 0.8em;
         font-family:Georgia, 'Times New Roman', Times, serif;
       }
 
@@ -74,43 +85,78 @@
       .hero__image {
         display: block;
         width: 100%;
+        max-width: 200px;
+        margin: 0 auto;
+        float: left;
+        padding-right: 20px;
       }
 
       .hidden {
         display: none;
         visibility: hidden;
       }
+
+      .loading {
+        position: absolute;
+        width: 100px;
+        height: 100px;
+        top: 45%;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: table;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .loading__ball {
+        animation: loading infinite 0.2s linear;
+        background:url('./loading.png');
+        background-size: 40px;
+        background-repeat: no-repeat;
+        border-radius: 200px;
+        display: block;
+        height: 40px;
+        position: relative;
+        margin: 0 auto;
+        width: 40px;
+      }
+
+      .loading__text {
+        color: #ffffff;
+        font-size: 0.7em;
+      }
       
       p {
-        font-family: Georgia, 'Times New Roman', Times, serif;
+        /* font-family: Georgia, 'Times New Roman', Times, serif; */
         font-size: 1em;
         line-height: 1.5em;
       }
       .swapi {
-        background: #212121;
-        color: white;
+        color: #212121;
         min-height: 100vh;
         width: 100%;
       }
 
       .swapi__grid {
-        width: 80%;
+        width: 60%;
         height: 100vh;
         margin: 0 auto;
         margin-top: 75px;
         padding-top: 100px;
+        text-align: center;
       }
 
       .swapi__person {
         color: gold;
-        font-size: 3em;
+        font-size: 1em;
         text-shadow: 2px 2px #000000;
       }
 
       .swapi__h2 {
-        color: rgb(187, 185, 174);
+        color: #a959a8;
         font-weight: 100;
-        font-size: 1.4em;
+        font-size: 1em;
         text-transform: capitalize;
       }
 
@@ -118,12 +164,35 @@
         color: white;
       }
 
-      .adv__title {
-        line-height: 1.3em;
-        font-size: 2em;
-        font-weight: 100;
-        color: #242424;
-        font-family: Georgia, 'Times New Roman', Times, serif;
+      .toggle {
+        box-shadow: 0px 4px 10px 0px rgba(0,0,0,0.75);
+        background: #ffffff;
+        border: 1px solid white;
+        color: #1b091a;
+        display: block;
+        font-weight: bold;
+        left: 0;
+        margin: 0 auto;
+        padding: 10px;
+        position: absolute;
+        width: 210px;
+        right: 0;
+        top: 20px;
+        transition: all 0.2s; 
+      }
+      .toggle:hover {
+        box-shadow: 0px 4px 5px 0px rgba(0,0,0,0.25);
+        transition: all 0.04s; 
+        margin-top: 2px;
+      }
+
+      @keyframes loading {
+        0% {
+          transform: rotate(1deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
       }
 
       
@@ -134,18 +203,28 @@
   <body>
     <header class="header">
       <h1 class="h1">
-        Calling data from 'mtrest.advance.net/' - See data from <button onClick="handleApiSwap2()">'swapi.co'</button>
+        <button class="toggle" onClick="handleApiSwap2()">CLICK HERE TO TOGGLE API'S</button>
       </h1>
     </header>
+    
     <section 
       class="advance-content  advance-local  visible" 
       id="advance-local-news">
       <!-- JS rendered HTML get's injected here. See: ln 144 -->
+      <div id="loading-adv" class="loading">
+        <span class="loading__ball"></span>
+        <span class="loading__text">LOADING DATA</span>
+      </div>
     </section>
     <section 
       class="swapi" 
       id="swapi">
-      <div class="swapi-content  swapi__grid  hidden" id="swapi__html"></div>
+      <div class="swapi-content  swapi__grid  hidden" id="swapi__html">
+      <div id="loading-swapi" class="loading">
+          <span class="loading__ball"></span>
+          <span class="loading__text">LOADING DATA</span>
+        </div>
+      </div>
       <!-- JS rendered HTML get's injected here. See: ln 144 -->
     </section>
 
@@ -158,7 +237,7 @@
       
       const ADVANCE_HTML_CONTENT = document.getElementById("advance-local-news");
       const SWAPI_HTML_CONTENT = document.getElementById("swapi__html");
-
+      const LOADING = document.getElementById("loading");
       const urls = [
         ADVANCE_API_URL,
         SWAPI_API_URL
@@ -169,7 +248,10 @@
 
       // Using native Fetch() api - not supported in IE but there are polyfills around.
       // Check if there was a 200 reterned from the server
+
+       
         .then(response => {
+          
           if (response.status !== 200) {
             console.log('Looks like there was a problem. Status Code: ' +
               response.status);
@@ -214,7 +296,7 @@
               );
 
               // Finally render the mapped data to the DOM.
-              ADVANCE_HTML_CONTENT.innerHTML += HTML;
+              ADVANCE_HTML_CONTENT.innerHTML = HTML;
 
               // THE END
           }
@@ -247,7 +329,7 @@
 
             // Assign the parent data layer to the a re-usable variable.
             let data = responseData.results; 
-                console.log(data);
+                // console.log(data);
                 data.map(d => {
                   // console.log(d);
                   // Add a conditional to filter out missing pieces of content such as null / empty / undefined 
@@ -273,9 +355,9 @@
               );
 
               // Finally render the mapped data to the DOM.
-              SWAPI_HTML_CONTENT.innerHTML += SWAPI_HTML;
+              SWAPI_HTML_CONTENT.innerHTML = SWAPI_HTML;
 
-              console.log(SWAPI_HTML);
+              // console.log(SWAPI_HTML);
               // THE END
           }
         )
